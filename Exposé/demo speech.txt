@@ -1,0 +1,121 @@
+﻿library("tm")
+library("SnowballC")
+library("wordcloud")
+library("RColorBrewer")
+
+#---------------------------------- Lire le fichier texte-----------------------------------------------
+
+filePath <- "http://www.sthda.com/sthda/RDoc/example-files/martin-luther-king-i-have-a-dream-speech.txt"
+text <- readLines(filePath)
+
+#--------------------------- Charger les données comme un corpus----------------------------------------
+myCorpus <- Corpus(VectorSource(text))
+myCorpus 
+inspect(myCorpus[1])
+inspect(myCorpus[2])
+
+
+#-------------------------------------------------------------
+#					NETTOYAGE de Text 
+#-------------------------------------------------------------
+
+#------------------1)suppression des Emoticones ☺☺ ----------
+ myCorpus=tm_map(myCorpus,content_transformer(gsub),pattern="\\W",replace=" ")
+ 
+#------------------2)suppression des URL --------------------
+removeURL <- function(x) gsub("http[^[:space:]]*", "",x)
+myCorpus <- tm_map(myCorpus,content_transformer(removeURL))
+
+#------------3) transformation de text en Minuscules--------- 
+myCorpus <- tm_map(myCorpus,content_transformer(tolower))
+
+#-----4) enlevement de tous les lettres pas anglais ou espace-- 
+removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*" , "",x)
+myCorpus <- tm_map(myCorpus,content_transformer(removeNumPunct))
+
+#------------5) suppression des ponctuations -------------------
+myCorpus=tm_map(myCorpus,removePunctuation)
+
+#------------6) suppression des numeros -------------------
+myCorpus=tm_map(myCorpus,removeNumbers)
+
+#-----7) suppression des stop words("a", "and", "but", "how", "or") -------
+myCorpus=tm_map(myCorpus,removeWords,stopwords("english"))
+
+#------------8) suppression Whitespace -------------------
+myCorpus=tm_map(myCorpus,stripWhitespace)
+
+#------------9) suppression votre propre mots -------------------
+myCorpus <- tm_map(myCorpus,removeWords,c("mot1","mot2"))
+
+
+#-------------------------------------------------------------
+#				WORLD CLOUD(nuages de mots)
+#-------------------------------------------------------------
+#Le nuage de mots est un outil de communication puissant
+#				plus agréable qu’une table de données remplie de textes
+#---------------------------------------
+dtm <- TermDocumentMatrix(myCorpus)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 15)
+
+
+#---------------------Cloud-----------------------------
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+
+
+#-------------------Mot se Repete 4 fois au moins ---------
+dtmp <- TermDocumentMatrix(myCorpus)
+findFreqTerms(dtmp, lowfreq = 4)
+
+
+#-----------------Graphe----------------------------
+(freq.terms2 <- findFreqTerms(dtmp, lowfreq = 4))
+plot(dtm, term = freq.terms2, corThreshold = 0.24, weighting = F, 
+attrs=list(node=list(width=20, fontsize=25, fontcolor="blue", color="red")))
+
+#-------------------Mot se Repete 7 fois au moins ---------
+dtmp <- TermDocumentMatrix(myCorpus)
+findFreqTerms(dtmp, lowfreq = 7)
+
+
+#-----------------Graphe----------------------------
+(freq.terms2 <- findFreqTerms(dtmp, lowfreq = 7))
+plot(dtm, term = freq.terms2, corThreshold = 0.24, weighting = F, 
+attrs=list(node=list(width=20, fontsize=25, fontcolor="blue", color="red")))
+
+#-------------------Mot se Repete 10 fois au moins ---------
+dtmp <- TermDocumentMatrix(myCorpus)
+findFreqTerms(dtmp, lowfreq = 10)
+
+
+#-----------------Graphe----------------------------
+(freq.terms2 <- findFreqTerms(dtmp, lowfreq = 10))
+plot(dtm, term = freq.terms2, corThreshold = 0.24, weighting = F, 
+attrs=list(node=list(width=20, fontsize=25, fontcolor="blue", color="red")))
+
+
+
+
+#------------------- Association avec des mots-------------
+dtmp <- TermDocumentMatrix(myCorpus)
+findAssocs(dtmp, terms = "dream", corlimit = 0.3)
+
+
+
+#----------------- DIAGRAME Dendrogram---------------
+
+dtm2p <- removeSparseTerms(dtmp, sparse = 0.95)
+m2p <- as.matrix(dtm2p)
+# cluster terms
+distMatrixp <- dist(scale(m2p))
+fit <- hclust(distMatrixp, method = "ward.D2")
+plot(fit)
+rect.hclust(fit, k=8) #cut tree into 8 clusters
+

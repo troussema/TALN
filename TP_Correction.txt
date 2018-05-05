@@ -1,0 +1,752 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Conversion de phrases en Prolog
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+etudiant(john).
+etudiant(jack).
+etudiant(mary).
+
+homme(john).
+homme(jack).
+
+femme(mary).
+
+amoureux(X,Y) :-
+    etudiant(X),
+    etudiant(Y),
+    homme(X),
+    femme(Y).
+amoureux(X,Y) :-
+    etudiant(X),
+    etudiant(Y),
+    homme(Y),
+    femme(X).
+
+
+/* 
+Est-ce que John est un étudiant ? 
+?- etudiant(john).
+
+Est-ce que John est une femme ?
+?- femme(john).
+
+Est-ce que John peut aimer Mary ?
+?- amoureux(john,mary).
+
+Est-ce que John peut aimer Jack ?
+?- amoureux(john,jack).
+
+Qui aime qui ?
+?- amoureux(X,Y).
+*/
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Conversion de phrases en Prolog
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/* Dijon est une ville localisée en Bourgogne */
+localisation(dijon,bourgogne).
+
+/* Nice est une ville localisée en Provence */
+localisation(nice,provence).
+
+/* Paris est une ville localisée en Ile de France */
+localisation(paris,iledefrance).
+
+/* Londres est une ville localisée en Greater London */
+localisation(londres,greaterlondon).
+
+/* Newcastle est une ville localisée en Avon */
+localisation(newcastle,avon).
+
+/* Si une ville est localisée en Bourgogne, alors elle est localisée en France */
+localisation(Ville,france) :-
+    localisation(Ville,bourgogne).
+
+/* Si une ville est localisée en Provence, alors elle est localisée en France */
+localisation(Ville,france) :-
+    localisation(Ville,provence).
+
+/* Si une ville est localisée en Ile de France, alors elle est localisée en France */
+localisation(Ville,france) :-
+    localisation(Ville,iledefrance).
+
+/* Si une ville est localisée en Greater London, alors elle est localisée en Grande Bretagne */
+localisation(Ville,grandebretagne) :-
+    localisation(Ville,greaterlondon).
+
+/* Si une ville est localisée en Avon, alors elle est localisée en Grande Bretagne */
+localisation(Ville,grandebretagne) :-
+    localisation(Ville,avon).
+
+/* Si une ville est localisée en France, alors elle est localisée en Europe */
+localisation(Ville,europe) :-
+    localisation(Ville,france).
+
+/* Si une ville est localisée en Grande Bretagne, alors elle est localisée en Europe */
+localisation(Ville,europe) :-
+    localisation(Ville,grandebretagne).
+
+ /*
+Est-ce que Dijon est localisée en France ?
+?- localisation(dijon,france).
+
+Est-ce que Nice est localisée en Grande Bretagne ?
+?- localisation(nice,grandebretagne).
+
+Quelles sont les villes localisées en France ?
+?- localisation(Ville,france).
+
+Quelles sont les villes localisées en Europe ?
+?- localisation(Ville,europe).
+
+Dans quelle région, pays et continent est localisée la ville de Dijon ?
+?- localisation(dijon,X).
+*/
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Conversion de phrases en Prolog
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/* Le metier de Chopin, Liszt et Rachmaninov est compositeur de musique classique. */
+metier(chopin,compositeur).
+metier(liszt,compositeur).
+metier(rachmaninov,compositeur).
+
+/* Le metier de Jagger et Presley est chanteur de rock.  */
+metier(jagger,chanteurrock).
+metier(presley,chanteurrock).
+
+/* Le metier de Sartre est philosophe et ecrivain.  */
+metier(sartre,philosophe).
+metier(sartre,ecrivain).
+
+/* Le metier de Levy est ecrivain.  */
+metier(levy,ecrivain).
+
+/* Si le metier de quelqu un est compositeur de musique classique ou chanteur de rock,
+alors le domaine de travail de cette personne est la musique.  */
+domainetravail(P,musique) :-
+    metier(P,compositeur).
+domainetravail(P,musique) :-
+    metier(P,chanteurrock).
+
+/* Si le metier de quelqu un est philosophe ou écrivain, 
+alors le domaine de travail de cette personne est l ecriture.  */
+domainetravail(P,ecriture) :-
+    metier(P,philosophe).
+domainetravail(P,ecriture) :-
+    metier(P,ecrivain).
+
+/* Si le domaine de travail de quelqu'un est l'écriture ou la musique, 
+alors cette personne est un artiste. */
+estun(P,artiste) :-
+    domainetravail(P,ecriture).
+estun(P,artiste) :-
+    domainetravail(P,musique).
+
+/*
+Quels sont les noms des compositeurs de musique classique ?
+?- metier(Nom,compositeur).
+
+Quels sont les noms de tous les artistes ?
+?- estun(Nom,artiste).
+
+Y-a-t-il des personnes qui sont à la fois écrivain et musicien ?
+?- metier(P,ecrivain),domainetravail(P,musique).
+
+Quels sont les métiers de Sartre ?
+?- metier(M,sartre).
+
+Quel est le domaine de travail de Sartre ?
+?- domainetravail(sartre,D).
+
+Sartre est-il un artiste ?
+?- estun(sartre,artiste).
+*/
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Les liens de parentes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+spouse(X, Y)             :-  married(X, Y).
+husband(X, Y)            :-  male(X),       married(X, Y).
+wife(X, Y)               :-  female(X),     married(X, Y).
+father(X, Y)             :-  male(X),       parent(X, Y).
+mother(X, Y)             :-  female(X),     parent(X, Y).
+sibling(X, Y)            :-  father(Z, X),  father(Z, Y),
+                             mother(W, X),  mother(W, Y),    X \== Y.
+brother(X, Y)            :-  male(X),       sibling(X, Y).
+sister(X, Y)             :-  female(X),     sibling(X, Y).
+grandparent(X, Z)        :-  parent(X, Y),  parent(Y, Z).
+grandfather(X, Z)        :-  male(X),       grandparent(X, Z).
+grandmother(X, Z)        :-  female(X),     grandparent(X, Z).
+grandchild(X, Z)         :-  grandparent(Z, X).
+grandson(X, Z)           :-  male(X),       grandchild(X, Z).
+granddaughter(X, Z)      :-  female(X),     grandchild(X, Z).
+ancestor(X,Y)            :-  parent(X,Y).
+ancestor(X, Y)           :-  parent(X, Z),  ancestor(Z, Y).
+child(Y, X)              :-  parent(X, Y).
+son(Y, X)                :-  male(Y),       child(Y, X).
+daughter(Y, X)           :-  female(Y),     child(Y, X).
+descendent(Y, X)         :-  ancestor(X, Y).
+auntoruncle(X, W)        :-  sibling(X, Y), parent(Y, W).
+auntoruncle(X, Z)        :-  married(X,Y),  sibling(Y,W),    parent(W,Z).
+uncle(X, W)              :-  male(X),       auntoruncle(X, W).
+aunt(X, W)               :-  female(X),     auntoruncle(X, W).
+cousin(X, Y)             :-  parent(Z, X),  auntoruncle(Z, Y).
+nieceornephew(X, Y)      :-  parent(Z, X),  sibling(Z, Y).
+nephew(X, Y)             :-  male(X),       nieceornephew(X, Y).
+niece(X, Y)              :-  female(X),     nieceornephew(X, Y).
+greatgrandparent(X, Z)   :-  parent(X, Y),  grandparent(Y, Z).
+greatgrandfather(X, Z)   :-  male(X),       greatgrandparent(X, Z).
+greatgrandmother(X, Z)   :-  female(X),     greatgrandparent(X, Z).
+greatgrandchild(X, Z)    :-  child(X, Y),   grandchild(Y, Z).
+greatgrandson(X, Z)      :-  male(X),       greatgrandchild(X, Z).
+greatgranddaughter(X, Z) :-  female(X),     greatgrandchild(X, Z).
+parentinlaw(X, Y)        :-  married(Y, Z), parent(X, Z).
+fatherinlaw(X, Y)        :-  male(X),       parentinlaw(X, Y).
+motherinlaw(X, Y)        :-  female(X),     parentinlaw(X, Y).
+siblinginlaw(X, Y)       :-  married(Y, Z), sibling(X, Z).
+brotherinlaw(X, Y)       :-  male(X),       siblinginlaw(X, Y).
+sisterinlaw(X, Y)        :-  female(X),     siblinginlaw(X, Y).
+childinlaw(X, Y)         :-  married(X, Z), child(Z, Y).
+soninlaw(X, Y)           :-  male(X),       childinlaw(X, Y).
+daughterinlaw(X, Y)      :-  female(X),     childinlaw(X, Y).
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Generation d un menu
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+entree(salade_verte).
+entree(salade_de_tomates).
+entree(melon).
+plat(lasagne).
+plat(pizza).
+plat(cote_de_boeuf).
+dessert(fromage).
+dessert(glace).
+dessert(gateau).
+
+menu(tres_faim,A,B,C) :- 
+    entree(A),
+    plat(B),
+    dessert(C).
+menu(faim,A,B,rien) :- 
+    entree(A),
+    plat(B).
+menu(faim,A,B,rien) :- 
+    plat(A),
+    dessert(B).
+menu(regime,A,rien,rien) :- 
+    entree(A).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Une petite grammaire sans DCG
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+mot(le,article).
+mot(la,article).
+mot(mange,verbe).
+mot(chat,nom).
+mot(souris,nom).
+mot(blanc,adjectif).
+mot(blanche,adjectif).
+mot(noir,adjectif).
+mot(noire,adjectif).
+
+phrase(M1,M2,M3,M4,M5,M6,M7) :-
+  mot(M1,article),
+  mot(M2,nom),
+  mot(M3,adjectif),
+  mot(M4,verbe),
+  mot(M5,article),
+  mot(M6,nom),
+  mot(M7,adjectif).
+
+/* 
+deux phrases syntaxiquement correctes vis-à-vis de cette grammaire :
+?- phrase(le,chat,blanc,mange,le,souris,blanche).
+?- phrase(le,chat,blanc,mange,le,chat,blanc).
+
+but à prouver pour générer toutes les phrases syntaxiquement correctes
+vis-à-vis de cette grammaire :
+?- phrase(A,B,C,D,E,F,G).
+*/
+
+/* pour prendre en compte les accords */
+mot_bis(le,article,masculin,singulier).
+mot_bis(la,article,feminin,singulier).
+mot_bis(les,article,masculin,pluriel).
+mot_bis(les,article,feminin,pluriel).
+mot_bis(mange,verbe).
+mot_bis(chat,nom,masculin,singulier).
+mot_bis(chats,nom,masculin,pluriel).
+mot_bis(souris,nom,feminin,singulier).
+mot_bis(souris,nom,feminin,pluriel).
+mot_bis(blanc,adjectif,masculin,singulier).
+mot_bis(blancs,adjectif,masculin,pluriel).
+mot_bis(blanche,adjectif,feminin,singulier).
+mot_bis(blanches,adjectif,feminin,pluriel).
+mot_bis(noir,adjectif,masculin,singulier).
+mot_bis(noirs,adjectif,masculin,pluriel).
+mot_bis(noire,adjectif,feminin,singulier).
+mot_bis(noires,adjectif,feminin,pluriel).
+
+phrase_bis(M1,M2,M3,M4,M5,M6,M7) :-
+  mot(M1,article,Genre1,Nombre1),
+  mot(M2,nom,Genre1,Nombre1),
+  mot(M3,adjectif,Genre1,Nombre1),
+  mot(M4,verbe),
+  mot(M5,article,Genre2,Nombre2),
+  mot(M6,nom,Genre2,Nombre2),
+  mot(M7,adjectif,Genre2,Nombre2).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Les mutants
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+animal(alligator).
+animal(tortue).
+animal(caribou).
+animal(ours).
+animal(cheval).
+animal(vache).
+animal(lapin).
+animal(bouc).
+animal(pintade).
+
+mutant(Mutant) :-
+  animal(Animal1),animal(Animal2),
+  name(Animal1,Lanimal1),name(Animal2,Lanimal2),
+  append(Debuta1,Fina1,Lanimal1),Fina1 \== [],
+  append(Fina1,Fina2,Lanimal2),Fina2 \== [],
+  append(Debuta1,Lanimal2,Lmutant),
+  name(Mutant,Lmutant).
+  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Prédicats sur les listes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+concatenation([],L,L).
+concatenation([X|L1],L2,[X|L3]) :- 
+    concatenation(L1,L2,L3).
+
+est_dans(X,[X|L]).
+est_dans(X,[Y|L]) :- 
+    est_dans(X,L).
+
+premier(X,[X|_]).
+
+dernier(X,[X]).
+dernier(X,[Y|Q]) :- 
+    dernier(X,Q).
+
+longueur([],0).
+longueur([X|Q],M) :-
+  longueur(Q,N),
+  M is N+1.
+
+element_k(X,[X|_],1).
+element_k(X,[_|L],K) :-
+  K > 1, K1 is K - 1,
+  element_k(X,L,K1).
+
+retourne(L1,L2) :- 
+    retourne3(L1,L2,[]).
+
+retourne3([],L,L) :- !.
+retourne3([X|L1],L2,L3) :- 
+    retourne3(L1,L2,[X|L3]).
+
+retourne_append([],[]).
+retourne_append([X|L1],L2) :-
+  retourne_append(L1,L3),
+  append(L3,[X],L2).
+
+est_palindrome(L) :- 
+    retourne(L,L).
+
+duplique([],[]).
+duplique([X|L1],[X,X|L2]) :- 
+    duplique(L1,L2).
+
+duplique(L1,N,L2) :- 
+    duplique(L1,N,L2,N).
+
+duplique([],_,[],_).
+duplique([_|L1],N,L2,0) :- 
+    duplique(L1,N,L2,N).
+duplique([X|L1],N,[X|L2],K) :-
+  K > 0, K1 is K - 1,
+  duplique([X|L1],N,L2,K1).
+
+duplique2(L1,N,L2) :- 
+    duplique2(L1,N,L2,0).
+
+duplique2([],_,[],_).
+duplique2([_|L1],N,L2,N) :- 
+    duplique2(L1,N,L2,0).
+duplique2([X|L1],N,[X|L2],K) :-
+    K < N,
+  K1 is K+1,
+  duplique2([X|L1],N,L2,K1).
+
+compresse([],[]).
+compresse([X],[X]).
+compresse([X,X|L1],L2) :- 
+    compresse([X|L1],L2).
+compresse([X,Y|L1],[X|L2]) :- 
+    X \= Y, 
+    compresse([Y|L1],L2).
+
+split(L,0,[],L).
+split([X|L1],N,[X|L2],L3) :- 
+    N > 0, 
+    N1 is N - 1, 
+    split(L1,N1,L2,L3).
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+autre version de split (split2) qui permet de lancer
+?- split2([a,b,c,d,e,f],N,L1,L2).
+et d obtenir
+N = 0,
+L1 = [],
+L2 = [a, b, c, d, e]
+N = 1,
+L1 = [a],
+L2 = [b, c, d, e]
+N = 2,
+L1 = [a, b],
+L2 = [c, d, e]
+N = 3,
+L1 = [a, b, c],
+L2 = [d, e]
+N = 4,
+L1 = [a, b, c, d],
+L2 = [e]
+N = 5,
+L1 = [a, b, c, d, e],
+L2 = [].
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+split2(L,N,L1,L2):-
+     split2_bis(L,N,L1,L2,0).
+split2_bis(L,N,[],L,N).
+split2_bis([Tl|L],N,[Tl|L1],L2,P):-
+     K is P+1,
+     split2_bis(L,N,L1,L2,K).
+
+
+enleve_a(X,[X|L],1,L).
+enleve_a(X,[Y|L1],K,[Y|L2]) :- 
+   K > 1,
+   K1 is K - 1, 
+   enleve_a(X,L1,K1,L2).
+
+insere_a(X,L,K,R) :- 
+   enleve_a(X,R,K,L).
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Prédicats sur les arbres binaires
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+est_un_arbre(nil).
+est_un_arbre(t(_,L,R)) :-
+	est_un_arbre(L),
+	est_un_arbre(R).
+
+compte_feuilles(nil,0).
+compte_feuilles(t(_,nil,nil),1).
+compte_feuilles(t(_,L,nil),N) :-
+    L = t(_,_,_), compte_feuilles(L,N).
+compte_feuilles(t(_,nil,R),N) :-
+    R = t(_,_,_), compte_feuilles(R,N).
+compte_feuilles(t(_,L,R),N) :-
+    L = t(_,_,_), R = t(_,_,_),
+    compte_feuilles(L,NL),
+    compte_feuilles(R,NR),
+    N is NL + NR.
+
+%% A noter la solution avec cut :%%
+compte_feuilles1(nil,0).
+compte_feuilles1(t(_,nil,nil),1) :- !.
+compte_feuilles1(t(_,L,R),N) :- 
+    compte_feuilles1(L,NL),
+	compte_feuilles1(R,NR),
+	N is NL+NR.
+
+
+collecte_feuilles(nil,[]).
+collecte_feuilles(t(X,nil,nil),[X]).
+collecte_feuilles(t(_,L,nil),S) :- 
+    L = t(_,_,_), collecte_feuilles(L,S).
+collecte_feuilles(t(_,nil,R),S) :- 
+    R = t(_,_,_), collecte_feuilles(R,S).
+collecte_feuilles(t(_,L,R),S) :-
+    L = t(_,_,_), R = t(_,_,_),
+    collecte_feuilles(L,SL),
+	collecte_feuilles(R,SR),
+	append(SL,SR,S).
+
+%% A noter la solution avec cut :%%
+collecte_feuilles1(nil,[]).
+collecte_feuilles1(t(X,nil,nil),[X]) :- !.
+collecte_feuilles1(t(_,L,R),S) :- 
+    collecte_feuilles1(L,SL),
+	collecte_feuilles1(R,SR),
+	append(SL,SR,S).
+
+
+
+collecte_noeuds_interne(nil,[]).
+collecte_noeuds_interne(t(_,nil,nil),[]).
+collecte_noeuds_interne(t(X,L,nil),[X|S]) :-
+	L = t(_,_,_), collecte_noeuds_interne(L,S).
+collecte_noeuds_interne(t(X,nil,R),[X|S]) :-
+	R = t(_,_,_), collecte_noeuds_interne(R,S).
+collecte_noeuds_interne(t(X,L,R),[X|S]) :-
+	L = t(_,_,_), R = t(_,_,_), 
+	collecte_noeuds_interne(L,SL),
+	collecte_noeuds_interne(R,SR),
+	append(SL,SR,S).
+
+
+%% A noter la solution avec cut :%%
+collecte_noeuds_interne1(nil,[]).
+collecte_noeuds_interne1(t(_,nil,nil),[]) :- !.
+collecte_noeuds_interne1(t(X,L,R),[X|S]) :- 
+  collecte_noeuds_interne1(L,SL),
+	collecte_noeuds_interne1(R,SR),
+	append(SL,SR,S).
+
+collecte_noeuds_niveau(nil,[],_).
+collecte_noeuds_niveau(t(X,_,_),[X],1).
+collecte_noeuds_niveau(t(_,L,R),S,D) :-
+   D > 1, D1 is D-1,
+   collecte_noeuds_niveau(L,SL,D1),
+   collecte_noeuds_niveau(R,SR,D1),
+   append(SL,SR,S).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Prédicats sur les arbres n-aires
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+est_un_arbre(t(_,F)) :-
+    est_liste_arbres(F).
+
+est_liste_arbres([]).
+est_liste_arbres([T|L]) :-
+  est_un_arbre(T), 
+  est_liste_arbres(L).
+
+
+compte_noeuds(t(_,F),N) :- 
+  compte_noeuds(F,NF), 
+  N is NF+1.
+compte_noeuds([],0).
+compte_noeuds([T|L],N) :- 
+  compte_noeuds(T,NT), 
+  compte_noeuds(L,NL), 
+  N is NT+NL.
+
+
+longueur_chemin_interne(T,L) :- 
+  longueur_chemin_interne(T,0,L).
+longueur_chemin_interne(t(_,F),D,L) :- 
+  D1 is D+1, 
+  longueur_chemin_interne(F,D1,LF), 
+  L is LF+D.
+longueur_chemin_interne([],_,0).
+longueur_chemin_interne([T1|T2],D,L) :- 
+  longueur_chemin_interne(T1,D,L1), 
+  longueur_chemin_interne(T2,D,L2), 
+  L is L1+L2.
+
+
+ascendant(t(X,F),L) :- 
+  ascendant(F,LF), 
+  append(LF,[X],L).
+
+ascendant([],[]).
+ascendant([T|T1],L):-
+  ascendant(T,LT), 
+  ascendant(T1,LT1), 
+  append(LT,LT1,L).
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Prédicats sur les graphes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+chemin(G,A,B,P) :- 
+    chemin1(G,A,[B],P).
+
+chemin1(_,A,[A|P1],[A|P1]).
+chemin1(G,A,[Y|P1],P) :- 
+    adjacent(X,Y,G), 
+    \+ member(X,[Y|P1]), 
+    chemin1(G,A,[X,Y|P1],P).
+
+% A useful predicate: adjacent/3
+
+adjacent(X,Y,graphe(_,E)) :- 
+    member(e(X,Y),E).
+adjacent(X,Y,graphe(_,E)) :- 
+    member(e(Y,X),E).
+adjacent(X,Y,graphe(_,E)) :- 
+    member(e(X,Y,_),E).
+adjacent(X,Y,graphe(_,E)) :- 
+    member(e(Y,X,_),E).
+adjacent(X,Y,digraphe(_,A)) :- 
+    member(a(X,Y),A).
+adjacent(X,Y,digraphe(_,A)) :- 
+    member(a(X,Y,_),A).
+
+
+
+cycle(G,A,P) :- 
+   adjacent(B,A,G), 
+   chemin(G,A,B,P1), 
+   length(P1,L), 
+   L > 2, 
+   append(P1,[A],P).
+
+cycle_di(G,A,P) :- 
+   adjacent(B,A,G), 
+   chemin(G,A,B,P1), 
+   length(P1,L), 
+   L > 1, 
+   append(P1,[A],P).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DCG : conversion nombre lettres <--> nombre chiffres
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+nombre(0)-->[zero].
+nombre(N)-->xxxx(N).
+
+xxxx(N) --> xxx(N).
+xxxx(N) --> [mille], xxx(C), {N is 1000+C}.
+xxxx(N) --> digit(D), [mille], xxx(C), {D \== 1, N is D*1000+C}.
+
+xxx(N)-->xx(N).
+xxx(N)-->[cent],reste_xxx(N1),{N is 100+N1}.
+xxx(N)--> digit(D),[cent],reste_xxx(N1), {D \== 1, N is D*100+N1}. 
+
+digit(1)-->[un].
+digit(2)-->[deux].
+digit(3)-->[trois].
+digit(4)-->[quatre].
+digit(5)-->[cinq].
+digit(6)-->[six].
+digit(7)-->[sept].
+digit(8)-->[huit].
+digit(9)-->[neuf].
+
+reste_xxx(0)-->[].
+reste_xxx(N)-->xx(N).
+
+
+xx(N)-->digit(N).
+
+xx(N)-->n_10_19(N).
+xx(81)-->dizaine_20_60(80), digit(1).
+xx(71)-->dizaine(60),[et],n_10_19(11).
+xx(N)-->dizaine_20_60(M), reste1_xx(N1),{N is M+N1}.
+xx(N)-->dizaine(M), reste2_xx(N1),{N is M+N1}. 
+
+reste1_xx(0)-->[].
+reste1_xx(1)-->[et], digit(1).
+reste1_xx(N)-->digit(N), {N \== 1}.
+
+reste2_xx(0)-->[].
+reste2_xx(N)--> n_10_19(N).
+
+
+n_10_19(10)-->[dix].
+n_10_19(11)-->[onze].
+n_10_19(12)-->[douze].
+n_10_19(13)-->[treize].
+n_10_19(14)-->[quatorze].
+n_10_19(15)-->[quinze].
+n_10_19(16)-->[seize].
+n_10_19(17)-->[dix,sept].
+n_10_19(18)-->[dix,huit].
+n_10_19(19)-->[dix,neuf].
+
+dizaine(60)-->[soixante].
+dizaine(80)-->[quatre,vingt].
+
+dizaine_20_60(20)-->[vingt].
+dizaine_20_60(30)-->[trente].
+dizaine_20_60(40)-->[quarante].
+dizaine_20_60(50)-->[cinquante].
+dizaine_20_60(60)-->[soixante].
+dizaine_20_60(80)-->[quatre,vingt].
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Analyseur Morphologique de Jacques Pitrat en Prolog
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/* quelques exemples de données du fichier des mots */
+mot(tenir,verbe,conj1,tien,1).
+mot(tenir,verbe,conj1,ten,2).
+mot(tenir,verbe,conj1,tienn,3).
+mot(tenir,verbe,conj1,tin,4).
+mot(tenir,verbe,conj1,tin,5).
+
+/* quelques exemples de données du fichier des terminaisons */
+terminaison(vip1,s,1).
+terminaison(vip1,s,2).
+terminaison(vip1,t,3).
+terminaison(vip1,ons,4).
+terminaison(vip1,ez,5).
+terminaison(vip1,ent,6).
+
+/* quelques exemples de données du fichier des conjugaisons */
+conjugaison(conj1,ip,vip1,1,1).
+conjugaison(conj1,ip,vip1,1,2).
+conjugaison(conj1,ip,vip1,1,3).
+conjugaison(conj1,ip,vip1,2,4).
+conjugaison(conj1,ip,vip1,2,5).
+conjugaison(conj1,ip,vip1,3,6).
+conjugaison(conj1,ii,vii1,2,1).
+conjugaison(conj1,ii,vii1,2,2).
+conjugaison(conj1,ii,vii1,2,3).
+conjugaison(conj1,ii,vii1,2,4).
+conjugaison(conj1,ii,vii1,2,5).
+conjugaison(conj1,ii,vii1,2,6).
+
+
+analyse(Mot,MotCanonique,Categorie,Groupe,Personne) :-
+  name(Mot,LMot),
+  append(LRacine,Lterminaison,LMot),
+  name(Racine,LRacine),
+  name(Terminaison,LTerminaison),
+  mot(MotCanonique,Categorie,NomConjugaison,Racine,NumeroRacine),
+  terminaison(NomTerminaison,Terminaison,Personne),
+  conjugaison(NomConjugaison,Groupe,NomTerminaison,NumeroRacine,Personne).
+  
+
+genere(Mot,MotCanonique,Categorie,Groupe,Personne) :-
+  mot(MotCanonique,Categorie,NomConjugaison,Racine,NumeroRacine),
+  conjugaison(NomConjugaison,Groupe,NomTerminaison,NumeroRacine,Personne),
+  terminaison(NomTerminaison,Terminaison,Personne),
+  name(Racine,LRacine),
+  name(Terminaison,LTerminaison),
+  append(LRacine,LTerminaison,LMot),
+  name(Mot,LMot).
+
+  

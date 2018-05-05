@@ -1,0 +1,27 @@
+#------------------------------------------------------------------
+library(twitteR)
+library(ROAuth)
+library(base64enc)
+library(httpuv)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(Rgraphviz)
+
+
+
+#------------------------------------------------------------------
+#					Connexion a twitter
+#------------------------------------------------------------------
+
+options(httr_oauth_cache=T)
+api_key <- "ysfOY1g0bmwHjmXOZntO2cvwX" # your api_key
+api_secret <- "F7Ua47b0PEqMjw2vVgsIxcvCfEBpS28QNlg8j13PXmWSl8sZe5" # your api_secret
+access_token <- "139211163-epsqiu0LaZ0JlouxzF6jOF3X4kP55lybfjG54Nb1" # your access_token
+access_token_secret <- "wHD5DgBJq66HUVCj2gwZoaRmwSGquub70EwpJulFmAXT8" # your access_token_secret
+
+
+
+setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
+

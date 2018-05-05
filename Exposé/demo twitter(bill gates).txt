@@ -1,0 +1,166 @@
+﻿#CLEAR = CTRL+L
+
+#----------------------installation packages---------------------
+#devtools::install_github("jrowen/twitteR", ref = "oauth_httr_1_0")
+#------------------------------------------------------------------
+
+#install.packages(c("twitteR","ROAuth","base64enc","httpuv","tm","SnowballC","wordcloud","RColorBrewer"))
+
+#Pour Graph assoc
+#source("http://bioconductor.org/biocLite.R")
+#   biocLite("Rgraphviz")
+
+#------------------------------------------------------------------
+library(twitteR)
+library(ROAuth)
+library(base64enc)
+library(httpuv)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(Rgraphviz)
+
+
+
+#------------------------------------------------------------------
+#					Connexion a twitter
+#------------------------------------------------------------------
+
+options(httr_oauth_cache=T)
+api_key <- "ysfOY1g0bmwHjmXOZntO2cvwX" # your api_key
+api_secret <- "F7Ua47b0PEqMjw2vVgsIxcvCfEBpS28QNlg8j13PXmWSl8sZe5" # your api_secret
+access_token <- "139211163-epsqiu0LaZ0JlouxzF6jOF3X4kP55lybfjG54Nb1" # your access_token
+access_token_secret <- "wHD5DgBJq66HUVCj2gwZoaRmwSGquub70EwpJulFmAXT8" # your access_token_secret
+
+
+
+setup_twitter_oauth(api_key,api_secret,access_token,access_token_secret)
+
+
+#------------------------------------------------------------------
+#					Extraire des twittes
+#------------------------------------------------------------------
+#1500 tweet plus recent
+
+mach_tweets=searchTwitter('bill gates',n=1500,lang="en",resultType="recent")
+class(mach_tweets)
+str(mach_tweets)
+
+#affichage 1-10
+mach_tweets[1:10]
+
+#-----------------extraire les infos importantes--------------------
+#pour avoir du Text depuis les tweets(LIST)
+
+mach_text=sapply(mach_tweets,function(x) x$getText())
+mach_text[1]
+mach_text[2]
+
+#crée un corpus(def:ensemble de document) 
+myCorpus=Corpus(VectorSource(mach_text))
+myCorpus 
+inspect(myCorpus[1])
+inspect(myCorpus[2])
+
+#-------------------------------------------------------------
+#					NETTOYAGE de Text 
+#-------------------------------------------------------------
+
+#------------------1)suppression des Emoticones ☺☺ ----------
+ myCorpus=tm_map(myCorpus,content_transformer(gsub),pattern="\\W",replace=" ")
+ 
+#------------------2)suppression des URL --------------------
+removeURL <- function(x) gsub("http[^[:space:]]*", "",x)
+myCorpus <- tm_map(myCorpus,content_transformer(removeURL))
+
+#------------3) transformation de text en Minuscules--------- 
+myCorpus <- tm_map(myCorpus,content_transformer(tolower))
+
+#-----4) enlevement de tous les lettres pas anglais ou espace-- 
+removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*" , "",x)
+myCorpus <- tm_map(myCorpus,content_transformer(removeNumPunct))
+
+#------------5) suppression des ponctuations -------------------
+myCorpus=tm_map(myCorpus,removePunctuation)
+
+#------------6) suppression des numeros -------------------
+myCorpus=tm_map(myCorpus,removeNumbers)
+
+#-----7) suppression des stop words("a", "and", "but", "how", "or") -------
+myCorpus=tm_map(myCorpus,removeWords,stopwords("english"))
+
+#------------8) suppression Whitespace -------------------
+myCorpus=tm_map(myCorpus,stripWhitespace)
+
+#------------9) suppression votre propre mots -------------------
+myCorpus <- tm_map(myCorpus,removeWords,c("cambridge","facebook"))
+
+
+
+#-------------------------------------------------------------
+#				WORLD CLOUD(nuages de mots)
+#-------------------------------------------------------------
+#Le nuage de mots est un outil de communication puissant
+#				plus agréable qu’une table de données remplie de textes
+#---------------------------------------
+dtm <- TermDocumentMatrix(myCorpus)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 15)
+
+
+#---------------------graphe-----------------------------
+barplot(d[1:10,]$freq, las = 2, names.arg = d[1:10,]$word,
+        col ="lightblue", main ="Most frequent words",
+        ylab = "Word frequencies")
+
+
+
+#-----------NUAGES------------------
+set.seed(1234)
+ wordcloud(words = d$word, freq = d$freq,   # words, their freqs 
+          scale = c(2, 0.5),     # range of word sizes
+          1,                     # min.freq of words to consider
+          max.words = 100,       # max #words
+          colors = brewer.pal(8, "Dark2"))    # Plot results in a word cloud 
+
+#------------------ou -----------
+set.seed(1234)
+ wordcloud(words = d$word, freq = d$freq,   # words, their freqs 
+          scale = c(1.5, 0.5),     # range of word sizes
+          1,                     # min.freq of words to consider
+          max.words = 75,       # max #words
+          colors = brewer.pal(8, "Dark2"))    # Plot results in a word cloud 
+
+
+
+
+
+#-------------------Mot se Repete 200 fois au moins ---------
+dtmp <- TermDocumentMatrix(myCorpus)
+findFreqTerms(dtmp, lowfreq = 200)
+
+#-----------------Graphe----------------------------
+(freq.terms2 <- findFreqTerms(dtmp, lowfreq = 200))
+plot(dtm, term = freq.terms2, corThreshold = 0.24, weighting = F, 
+attrs=list(node=list(width=30, fontsize=35, fontcolor="blue", color="red")))
+
+#------------------- Association avec des mots-------------
+dtmp <- TermDocumentMatrix(myCorpus)
+findAssocs(dtmp, terms = "americans", corlimit = 0.3)
+
+
+#----------------- DIAGRAME Dendrogram---------------
+
+dtm2p <- removeSparseTerms(dtmp, sparse = 0.95)
+m2p <- as.matrix(dtm2p)
+# cluster terms
+distMatrixp <- dist(scale(m2p))
+fit <- hclust(distMatrixp, method = "ward.D2")
+plot(fit)
+rect.hclust(fit, k=8) #cut tree into 8 clusters
+
+
+  

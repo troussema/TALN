@@ -1,0 +1,28 @@
+﻿#---------------------------------
+#	PubMed Medical Text Mining
+#---------------------------------
+
+
+library(RISmed)
+
+
+#----------------Requete  -----Pneumothorax----
+search_topic <- 'Pneumonia'
+search_query <- EUtilsSummary(search_topic, retmax=100, mindate=2018,maxdate=2018)
+summary(search_query)
+
+#---------------id articles------------
+QueryId(search_query)
+
+#-------- enregistement resultat-------
+records<- EUtilsGet(search_query)
+class(records)
+
+
+#----------------recherche que dans les titres et resumes--------------
+pubmed_data <- data.frame('Title'=ArticleTitle(records),'Abstract'=AbstractText(records))
+head(pubmed_data,1)
+
+
+write.table(head(pubmed_data,1), "res_data.txt", sep="\t")
+write.table(head(pubmed_data,1), file="res_data.csv",sep=",",row.names=F)

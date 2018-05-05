@@ -1,0 +1,7 @@
+Tutorials:
+
+authentication.R
+cleaning_tweet.R, word_database.R (including positive-words.txt, negative-words.txt)
+score_sentiment.R, func_on_tweet.R
+percentage.R, graphs.R, top_10_hashtags.R, top_trends.R, wordcloud.R
+Front end folder
